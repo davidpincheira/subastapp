@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
 <meta name="referrer" content="no-referrer">
-<title>Martillo — subastas en vivo</title>
+<title>sUBASTAPP — subastas en vivo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -443,7 +443,7 @@ function renderHome(){
       <button class="btn btn-fantasma" id="btn-unirme">Entrar a la subasta</button>
       <div class="msg err" id="home-err" style="display:none"></div>
     </div>
-    <div class="footer-mark">martillo · rematá lo que quieras, en tiempo real</div>
+    <div class="footer-mark">subastapp · rematá lo que quieras, en tiempo real</div>
   `;
   document.getElementById('btn-crear').onclick = ()=>{ state.view='create'; render(); };
   const codeInput = document.getElementById('code-input');
@@ -744,7 +744,7 @@ function renderAuction(){
         </div>
       ` : ''}
     </div>
-    <div class="footer-mark">martillo · lote Nº ${state.code}</div>
+    <div class="footer-mark">subastapp · lote Nº ${state.code}</div>
   `;
 
   document.getElementById('back').onclick = ()=>{
@@ -928,7 +928,7 @@ async function generateStoryImage(){
     ctx.fillStyle = PAPEL;
     ctx.font = '700 26px "Space Mono", monospace';
     ctx.textAlign = 'center'; ctx.textBaseline='middle';
-    ctx.fillText('🔨 MARTILLO · ' + state.code, 0, 2);
+    ctx.fillText('🔨 SUBASTAPP · ' + state.code, 0, 2);
     ctx.restore();
     ctx.textBaseline = 'alphabetic';
 
