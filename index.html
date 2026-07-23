@@ -88,6 +88,17 @@
     transform:rotate(-4deg);
     box-shadow:3px 3px 0 var(--tinta);
   }
+  .local-note{
+    max-width:360px;
+    margin:-14px auto 24px;
+    text-align:center;
+    color:var(--piedra-claro);
+    font-size:11px;
+    line-height:1.5;
+    letter-spacing:0.2px;
+    opacity:0.85;
+  }
+  .local-note strong{ color:var(--mostaza); }
   .card{
     background:var(--papel);
     color:var(--tinta);
@@ -433,6 +444,7 @@ function renderHome(){
     <div class="brand"><span class="mazo">🔨</span><h1>Subastapp</h1></div>
     <div class="tagline">subastas en vivo, sin vueltas</div>
     <div class="sticker">¡se remata ya!</div>
+    <p class="local-note">Demo local: las salas se guardan en la memoria de <strong>este</strong> navegador. El código no se comparte con otros dispositivos.</p>
     <div class="card stack">
       <button class="btn btn-oro" id="btn-crear">Crear una subasta</button>
       <div class="divider-or">o</div>
