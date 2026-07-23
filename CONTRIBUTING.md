@@ -1,6 +1,6 @@
-# Contribuir a Martillo
+# Contribuir a Subastapp
 
-¡Gracias por pasar! Martillo es un proyecto chico y autocontenido, así que
+¡Gracias por pasar! Subastapp es un proyecto chico y autocontenido, así que
 contribuir es simple. No hay build ni dependencias: todo vive en `index.html`.
 
 ## Antes de arrancar

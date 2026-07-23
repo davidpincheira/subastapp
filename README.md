@@ -1,4 +1,4 @@
-# 🔨 Martillo
+# 🔨 Subastapp
 
 Subastas en vivo, sin vueltas. Creás un lote, compartís un código de 4
 caracteres y la gente entra a pujar en tiempo real desde el navegador.
@@ -69,7 +69,7 @@ si algún día lo necesitás.
 ## Estructura
 
 ```
-martillo/
+subastapp/
   index.html      # la app completa (HTML + CSS + JS inline)
   README.md
   CONTRIBUTING.md
