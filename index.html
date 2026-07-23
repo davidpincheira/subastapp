@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Martillo — subastas en vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --muro:#1b1712;
+    --muro-2:#241d16;
+    --papel:#f3ead4;
+    --papel-2:#ece0c4;
+    --tinta:#1c160f;
+    --naranja:#e2591c;
+    --naranja-2:#c8480f;
+    --turquesa:#12a3a0;
+    --mostaza:#e6ac2c;
+    --verde:#5c8a2e;
+    --rosa:#e2436b;
+    --piedra:#7a6f5c;
+    --piedra-claro:#c9bda3;
+    --linea: rgba(28,22,15,0.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(620px 520px at 6% 4%, rgba(226,89,28,0.38), transparent 60%),
+      radial-gradient(520px 460px at 96% 12%, rgba(18,163,160,0.30), transparent 60%),
+      radial-gradient(560px 520px at 50% 105%, rgba(230,172,44,0.22), transparent 60%),
+      var(--muro);
+    color:var(--papel);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    min-height:100vh;
+    padding:28px 20px 60px;
+    display:flex;
+    flex-direction:column;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:4px;
+  }
+  .brand .mazo{ font-size:24px; transform:rotate(-14deg); display:inline-block; }
+  .brand h1{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-style:normal;
+    text-transform:uppercase;
+    font-size:32px;
+    letter-spacing:1px;
+    margin:0;
+    color:var(--mostaza);
+    text-shadow: 3px 3px 0 var(--turquesa);
+  }
+  .tagline{
+    text-align:center;
+    color:var(--piedra-claro);
+    font-size:12.5px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    font-family:'Space Mono',monospace;
+    margin-bottom:18px;
+  }
+  .sticker{
+    display:block;
+    width:fit-content;
+    margin:0 auto 26px;
+    background:var(--rosa);
+    color:var(--papel);
+    font-family:'Permanent Marker',cursive;
+    font-size:13px;
+    padding:6px 16px;
+    border:2px solid var(--tinta);
+    border-radius:20px;
+    transform:rotate(-4deg);
+    box-shadow:3px 3px 0 var(--tinta);
+  }
+  .card{
+    background:var(--papel);
+    color:var(--tinta);
+    border:3px solid var(--tinta);
+    border-radius:6px;
+    padding:26px 22px;
+    box-shadow:9px 9px 0 var(--naranja);
+  }
+  .stack{ display:flex; flex-direction:column; gap:14px; }
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%;
+    padding:16px 18px;
+    border-radius:6px;
+    border:3px solid var(--tinta);
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    font-size:15.5px;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  }
+  .btn-oro{
+    background:var(--naranja);
+    color:var(--papel);
+    box-shadow:4px 4px 0 var(--tinta);
+  }
+  .btn-oro:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--tinta); filter:brightness(1.03); }
+  .btn-oro:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--tinta); }
+  .btn-fantasma{
+    background:var(--papel);
+    color:var(--tinta);
+    box-shadow:4px 4px 0 var(--turquesa);
+  }
+  .btn-fantasma:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--turquesa); }
+  .btn-fantasma:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--turquesa); }
+  .btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none !important; }
+  label{
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    color:var(--piedra);
+    font-family:'Space Mono',monospace;
+    display:block;
+    margin-bottom:6px;
+  }
+  input[type=text], input[type=number], textarea, select{
+    width:100%;
+    background:var(--papel-2);
+    border:2px solid var(--tinta);
+    color:var(--tinta);
+    padding:12px 13px;
+    border-radius:5px;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    outline:none;
+  }
+  input:focus, textarea:focus, select:focus{ border-color:var(--naranja); }
+  textarea{ resize:none; min-height:64px; }
+  .field{ margin-bottom:14px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .code-input{
+    text-align:center;
+    letter-spacing:6px;
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    font-size:20px;
+    text-transform:uppercase;
+  }
+  .divider-or{
+    display:flex; align-items:center; gap:12px;
+    color:var(--piedra); font-size:12px; font-family:'Space Mono',monospace;
+    margin:6px 0;
+  }
+  .divider-or::before,.divider-or::after{
+    content:''; flex:1; height:2px; background:var(--linea);
+  }
+  .upload-box{
+    border:2.5px dashed var(--tinta);
+    border-radius:8px;
+    padding:18px;
+    text-align:center;
+    cursor:pointer;
+    color:var(--piedra);
+    font-family:'Space Mono',monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    position:relative;
+    overflow:hidden;
+    min-height:90px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .upload-box img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  }
+  .upload-box:hover{ border-color:var(--naranja); }
+  .back-link{
+    color:var(--piedra-claro); font-size:13px; background:none; border:none;
+    cursor:pointer; display:flex; align-items:center; gap:6px; margin-bottom:16px;
+    font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .back-link:hover{ color:var(--mostaza); }
+
+  /* room / share */
+  .code-display{
+    text-align:center; padding:22px 0 10px;
+  }
+  .code-display .lotno{
+    font-family:'Space Mono',monospace; color:var(--piedra); font-size:12px; letter-spacing:2px; text-transform:uppercase;
+  }
+  .code-big{
+    font-family:'Anton',sans-serif;
+    font-size:48px;
+    letter-spacing:10px;
+    color:var(--naranja);
+    text-shadow:3px 3px 0 var(--turquesa);
+    margin:12px 0;
+  }
+  .hint{ color:var(--piedra); font-size:12.5px; text-align:center; line-height:1.5; }
+
+  /* auction view */
+  .lotno-tag{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--mostaza); text-align:center; margin-bottom:10px;
+  }
+  .spotlight{
+    position:relative;
+    border-radius:6px;
+    overflow:hidden;
+    background:var(--tinta);
+    padding:18px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px;
+    min-height:220px;
+    border:3px solid var(--tinta);
+  }
+  .spotlight::before{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse 70% 60% at 50% 35%, rgba(230,172,44,0.28), transparent 70%);
+    pointer-events:none;
+  }
+  .spotlight img{
+    max-width:100%; max-height:340px; border-radius:3px;
+    box-shadow:6px 6px 0 var(--naranja-2);
+    position:relative;
+    clip-path: polygon(1.5% 0.5%, 99% 0%, 100% 98.5%, 0.5% 100%);
+  }
+  .lot-title{
+    font-family:'Anton',sans-serif; font-weight:400; text-transform:uppercase;
+    font-size:25px; text-align:center; margin:2px 0 4px; letter-spacing:0.5px;
+  }
+  .lot-desc{
+    color:var(--piedra); font-size:13.5px; text-align:center; line-height:1.5; margin-bottom:18px;
+  }
+  .price-panel{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:2px solid var(--tinta); border-bottom:2px solid var(--tinta);
+    padding:16px 2px; margin-bottom:16px;
+  }
+  .price-panel .label{ font-size:11px; }
+  .price-big{
+    font-family:'Anton',sans-serif; font-weight:400; font-size:36px; color:var(--naranja);
+    text-shadow:2px 2px 0 var(--mostaza); line-height:1;
+  }
+  .leader-name{ font-family:'Permanent Marker',cursive; font-size:16px; margin-top:6px; color:var(--tinta); }
+  .timer{
+    text-align:right;
+  }
+  .timer .t{ font-family:'Space Mono',monospace; font-weight:700; font-size:20px; }
+  .timer .t.urgente{ color:var(--rosa); }
+  .bidbar{
+    display:flex; gap:10px; margin-bottom:12px;
+  }
+  .bidbar .btn{ flex:1; font-size:13px; padding:14px 6px; }
+  .custom-bid{ display:flex; gap:8px; margin-bottom:6px;}
+  .custom-bid input{ flex:1; }
+  .custom-bid .btn{ width:auto; padding:12px 18px; }
+  .name-field{ margin-bottom:14px; }
+  .history{
+    margin-top:8px;
+  }
+  .history h4{
+    font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--piedra);
+    font-family:'Space Mono',monospace; margin:18px 0 8px;
+  }
+  .hist-item{
+    display:flex; justify-content:space-between; padding:8px 0;
+    border-bottom:1px solid rgba(28,22,15,0.12);
+    font-size:13.5px;
+  }
+  .hist-item .a{ color:var(--piedra); }
+  .hist-item.top .a{ color:var(--naranja); font-weight:700; }
+  .hist-item .p{ font-family:'Space Mono',monospace; }
+  .status-pill{
+    display:inline-block; margin:0 auto 14px; padding:6px 16px; border-radius:20px;
+    font-size:11px; letter-spacing:1px; text-transform:uppercase; font-family:'Space Mono',monospace; font-weight:700;
+    background:var(--rosa); color:var(--papel); border:2px solid var(--tinta);
+    transform:rotate(-3deg);
+    box-shadow:3px 3px 0 var(--tinta);
+  }
+  .status-pill.live{ background:var(--turquesa); color:var(--papel); }
+  .status-row{ display:flex; justify-content:center; }
+  .msg{ text-align:center; font-size:13px; color:var(--piedra-claro); margin-top:10px; }
+  .msg.err{ color:var(--rosa); }
+  .card .msg{ color:var(--piedra); }
+  .card .msg.err{ color:var(--naranja-2); font-weight:600; }
+  .share-row{ display:flex; gap:10px; margin-top:14px; }
+  .share-row .btn{ font-size:12px; padding:13px; }
+  .card-code-strip{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    font-family:'Space Mono',monospace; font-size:12px; color:var(--piedra);
+    margin-top:8px;
+  }
+  .card-code-strip b{ color:var(--turquesa); letter-spacing:3px; }
+  canvas#ig-canvas{ display:none; }
+  .footer-mark{
+    text-align:center; color:var(--piedra-claro); font-size:11px; font-family:'Space Mono',monospace;
+    margin-top:22px; letter-spacing:1px; text-transform:uppercase;
+  }
+  @keyframes pulse{ 0%{opacity:1} 50%{opacity:0.35} 100%{opacity:1} }
+  .live-dot{
+    width:7px;height:7px;border-radius:50%;background:var(--papel);display:inline-block;margin-right:6px;
+    animation:pulse 1.6s infinite;
+  }
+  .flash{
+    animation:flashbg 0.9s ease;
+  }
+  @keyframes flashbg{
+    0%{ background:var(--mostaza); }
+    100%{ background:var(--papel); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<canvas id="ig-canvas" width="1080" height="1920"></canvas>
+
+<script>
+/* ---------------- estado ---------------- */
+const state = {
+  view: 'home',
+  code: null,
+  lot: null,
+  bidderName: '',
+  loading: false,
+  error: null,
+  draft: { title:'', desc:'', image:null, start:1000, increment:100, duration:15, currency:'USD' },
+  pollTimer: null,
+  tickTimer: null,
+  lastBidCount: 0,
+};
+
+const app = document.getElementById('app');
+
+/* ---------------- storage shim ----------------
+   Si la app corre dentro del builder que la generó, usa el window.storage
+   que ese entorno inyecta. Fuera de ahí (GitHub Pages, Vercel, Netlify, o
+   abriendo el .html a mano) ese global no existe, así que caemos a
+   localStorage para que la app no muera al cargar.
+
+   OJO: localStorage es POR NAVEGADOR. El código de subasta no se comparte
+   entre dispositivos con este fallback — para eso hace falta un backend.
+   Ver la sección "Seguridad y límites" del README. */
+if(!window.storage){
+  window.storage = {
+    async set(key, value){ localStorage.setItem(key, String(value)); return true; },
+    async get(key){
+      const v = localStorage.getItem(key);
+      return v == null ? null : { value: v };
+    }
+  };
+}
+
+/* Solo permitimos orígenes de imagen inertes (data URI de imagen o blob).
+   Cualquier otra cosa se descarta, para que un valor manipulado no pueda
+   inyectar markup vía el atributo src. */
+function safeImageSrc(s){
+  s = String(s || '');
+  if(/^data:image\/(png|jpe?g|gif|webp|avif);/i.test(s)) return s;
+  if(/^blob:/i.test(s)) return s;
+  return '';
+}
+
+function fmtMoney(n, cur){
+  // cur puede venir de storage manipulado: lo limitamos a un código corto
+  // alfabético para que nunca inyecte markup donde se interpola sin escapar.
+  const safeCur = String(cur||'USD').replace(/[^A-Za-z]/g,'').slice(0,4) || 'USD';
+  const v = Number(n);
+  return safeCur + ' ' + (Number.isFinite(v) ? v : 0).toLocaleString('es-AR');
+}
+
+function genCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for(let i=0;i<4;i++) c += chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+
+function currentPrice(lot){
+  if(!lot.bids || lot.bids.length===0) return lot.start;
+  return lot.bids[lot.bids.length-1].amount;
+}
+function currentLeader(lot){
+  if(!lot.bids || lot.bids.length===0) return null;
+  return lot.bids[lot.bids.length-1];
+}
+function minNextBid(lot){
+  return currentPrice(lot) + Number(lot.increment);
+}
+function endedNow(lot){
+  return Date.now() >= lot.endTime;
+}
+
+/* ---------------- storage helpers ---------------- */
+async function saveLot(code, lot){
+  await window.storage.set('lot:'+code, JSON.stringify(lot), true);
+}
+async function loadLot(code){
+  try{
+    const res = await window.storage.get('lot:'+code, true);
+    if(!res) return null;
+    return JSON.parse(res.value);
+  }catch(e){
+    return null;
+  }
+}
+
+/* ---------------- render router ---------------- */
+function render(){
+  if(state.view==='home') return renderHome();
+  if(state.view==='create') return renderCreate();
+  if(state.view==='room') return renderRoom();
+  if(state.view==='join') return renderJoin();
+  if(state.view==='auction') return renderAuction();
+}
+
+/* ---------------- HOME ---------------- */
+function renderHome(){
+  app.innerHTML = `
+    <div class="brand"><span class="mazo">🔨</span><h1>Subastapp</h1></div>
+    <div class="tagline">subastas en vivo, sin vueltas</div>
+    <div class="sticker">¡se remata ya!</div>
+    <div class="card stack">
+      <button class="btn btn-oro" id="btn-crear">Crear una subasta</button>
+      <div class="divider-or">o</div>
+      <div class="field" style="margin-bottom:0">
+        <label>Tengo un código</label>
+        <input type="text" maxlength="4" placeholder="EJ: 7XQ2" class="code-input" id="code-input">
+      </div>
+      <button class="btn btn-fantasma" id="btn-unirme">Entrar a la subasta</button>
+      <div class="msg err" id="home-err" style="display:none"></div>
+    </div>
+    <div class="footer-mark">martillo · rematá lo que quieras, en tiempo real</div>
+  `;
+  document.getElementById('btn-crear').onclick = ()=>{ state.view='create'; render(); };
+  const codeInput = document.getElementById('code-input');
+  codeInput.oninput = ()=>{ codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g,''); };
+  document.getElementById('btn-unirme').onclick = async ()=>{
+    const code = codeInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+    const errEl = document.getElementById('home-err');
+    if(code.length<4){ errEl.textContent='Ingresá el código de 4 caracteres.'; errEl.style.display='block'; return; }
+    errEl.style.display='none';
+    document.getElementById('btn-unirme').textContent = 'Buscando...';
+    const lot = await loadLot(code);
+    if(!lot){ errEl.textContent='No encontramos ninguna subasta con ese código.'; errEl.style.display='block';
+      document.getElementById('btn-unirme').textContent='Entrar a la subasta'; return; }
+    state.code = code; state.lot = lot; state.lastBidCount = lot.bids.length;
+    state.view='auction'; render(); startAuctionLoop();
+  };
+}
+
+/* ---------------- CREATE ---------------- */
+function renderCreate(){
+  const d = state.draft;
+  app.innerHTML = `
+    <button class="back-link" id="back">← volver</button>
+    <div class="brand" style="margin-bottom:2px"><span class="mazo">🔨</span><h1 style="font-size:22px">Nueva subasta</h1></div>
+    <div class="tagline" style="margin-bottom:22px">cargá la pieza y fijá las reglas</div>
+    <div class="card">
+      <div class="field">
+        <label>Foto de la pieza</label>
+        <div class="upload-box" id="upload-box">
+          ${d.image ? `<img src="${safeImageSrc(d.image)}" alt="Vista previa de la pieza">` : 'Tocá para subir una imagen'}
+        </div>
+        <input type="file" accept="image/*" id="file-input" style="display:none">
+      </div>
+      <div class="field">
+        <label>Título</label>
+        <input type="text" id="f-title" maxlength="120" placeholder="Ej: Óleo sobre tela, 'Atardecer en el río'" value="${escapeAttr(d.title)}">
+      </div>
+      <div class="field">
+        <label>Descripción</label>
+        <textarea id="f-desc" maxlength="600" placeholder="Autor, técnica, tamaño, estado...">${escapeHtml(d.desc)}</textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Precio base</label>
+          <input type="number" id="f-start" value="${d.start}" min="0">
+        </div>
+        <div class="field">
+          <label>Incremento mínimo</label>
+          <input type="number" id="f-inc" value="${d.increment}" min="1">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Duración</label>
+          <select id="f-dur">
+            <option value="5" ${d.duration==5?'selected':''}>5 minutos</option>
+            <option value="15" ${d.duration==15?'selected':''}>15 minutos</option>
+            <option value="60" ${d.duration==60?'selected':''}>1 hora</option>
+            <option value="360" ${d.duration==360?'selected':''}>6 horas</option>
+            <option value="1440" ${d.duration==1440?'selected':''}>24 horas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Moneda</label>
+          <select id="f-cur">
+            <option value="USD" ${d.currency==='USD'?'selected':''}>USD</option>
+            <option value="ARS" ${d.currency==='ARS'?'selected':''}>ARS</option>
+            <option value="EUR" ${d.currency==='EUR'?'selected':''}>EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tu nombre (como rematador)</label>
+        <input type="text" id="f-name" maxlength="40" placeholder="Cómo te van a ver los demás" value="${escapeAttr(state.bidderName)}">
+      </div>
+      <button class="btn btn-oro" id="btn-publicar" style="margin-top:6px">Publicar subasta</button>
+      <div class="msg err" id="create-err" style="display:none"></div>
+    </div>
+  `;
+  document.getElementById('back').onclick = ()=>{ state.view='home'; render(); };
+  document.getElementById('upload-box').onclick = ()=> document.getElementById('file-input').click();
+  document.getElementById('file-input').onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxW = 900;
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width*scale;
+        canvas.height = img.height*scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        d.image = canvas.toDataURL('image/jpeg', 0.75);
+        renderCreate();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  const bind = (id,key,isNum)=>{
+    document.getElementById(id).oninput = (e)=>{ d[key] = isNum? Number(e.target.value) : e.target.value; };
+  };
+  bind('f-title','title'); bind('f-desc','desc'); bind('f-start','start',true);
+  bind('f-inc','increment',true); bind('f-dur','duration',true); bind('f-cur','currency');
+  document.getElementById('f-name').oninput = (e)=>{ state.bidderName = e.target.value; };
+
+  document.getElementById('btn-publicar').onclick = async ()=>{
+    const errEl = document.getElementById('create-err');
+    if(!d.title.trim()){ errEl.textContent='Ponele un título a la pieza.'; errEl.style.display='block'; return; }
+    if(!state.bidderName.trim()){ errEl.textContent='Decinos tu nombre.'; errEl.style.display='block'; return; }
+    errEl.style.display='none';
+    const btn = document.getElementById('btn-publicar');
+    btn.disabled = true; btn.textContent='Publicando...';
+    const code = genCode();
+    const dur = [5,15,60,360,1440].includes(Number(d.duration)) ? Number(d.duration) : 15;
+    const lot = {
+      title: d.title.trim().slice(0,120),
+      desc: d.desc.trim().slice(0,600),
+      image: safeImageSrc(d.image),
+      start: Math.max(0, Math.min(1e15, Number(d.start)||0)) || 1,
+      increment: Math.max(1, Math.min(1e15, Number(d.increment)||1)),
+      currency: ['USD','ARS','EUR'].includes(d.currency) ? d.currency : 'USD',
+      createdBy: state.bidderName.trim().slice(0,40),
+      createdAt: Date.now(),
+      endTime: Date.now() + dur*60*1000,
+      bids: []
+    };
+    try{
+      await saveLot(code, lot);
+      state.code = code; state.lot = lot;
+      state.view='room'; render();
+    }catch(e){
+      errEl.textContent='No se pudo publicar. Probá de nuevo.'; errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Publicar subasta';
+    }
+  };
+}
+
+/* ---------------- ROOM (código creado) ---------------- */
+function renderRoom(){
+  app.innerHTML = `
+    <div class="brand"><span class="mazo">🔨</span><h1 style="font-size:22px">¡Ya está en pie!</h1></div>
+    <div class="card">
+      <div class="code-display">
+        <div class="lotno">código de la subasta</div>
+        <div class="code-big">${state.code}</div>
+        <div class="hint">Compartí este código (o el link) para que la gente entre y empiece a pujar.<br>Vale para Instagram, WhatsApp, donde quieras.</div>
+      </div>
+      <div class="stack" style="margin-top:20px">
+        <button class="btn btn-oro" id="btn-copiar">Copiar código</button>
+        <button class="btn btn-fantasma" id="btn-entrar">Ir a la subasta</button>
+      </div>
+      <div class="msg" id="room-msg"></div>
+    </div>
+  `;
+  document.getElementById('btn-copiar').onclick = async ()=>{
+    try{
+      await navigator.clipboard.writeText(state.code);
+      document.getElementById('room-msg').textContent = 'Código copiado ✓';
+    }catch(e){
+      document.getElementById('room-msg').textContent = state.code;
+    }
+  };
+  document.getElementById('btn-entrar').onclick = ()=>{
+    state.lastBidCount = state.lot.bids.length;
+    state.view='auction'; render(); startAuctionLoop();
+  };
+}
+
+/* ---------------- AUCTION ---------------- */
+function stopAuctionLoop(){
+  if(state.pollTimer){ clearInterval(state.pollTimer); state.pollTimer=null; }
+  if(state.tickTimer){ clearInterval(state.tickTimer); state.tickTimer=null; }
+}
+function startAuctionLoop(){
+  stopAuctionLoop();
+  state.tickTimer = setInterval(()=>{ updateTimerDom(); }, 1000);
+  state.pollTimer = setInterval(async ()=>{
+    const fresh = await loadLot(state.code);
+    if(!fresh) return;
+    const wasEnded = endedNow(state.lot);
+    const grew = fresh.bids.length > state.lot.bids.length;
+    const nowEnded = endedNow(fresh);
+    if(!grew && wasEnded===nowEnded){
+      // nada cambió: actualizamos el dato en silencio, sin repintar,
+      // para no borrar lo que el usuario esté escribiendo
+      state.lot = fresh;
+      return;
+    }
+    // algo cambió de verdad (nueva puja o cierre): guardamos lo que
+    // el usuario estaba tipiando para no perderlo al repintar
+    const nameEl = document.getElementById('bid-name');
+    const customEl = document.getElementById('bid-custom');
+    const savedName = nameEl ? nameEl.value : '';
+    const savedCustom = customEl ? customEl.value : '';
+    const focusedId = document.activeElement ? document.activeElement.id : null;
+
+    state.lot = fresh;
+    renderAuction();
+
+    const nameEl2 = document.getElementById('bid-name');
+    const customEl2 = document.getElementById('bid-custom');
+    if(nameEl2 && savedName) nameEl2.value = savedName;
+    if(customEl2 && savedCustom) customEl2.value = savedCustom;
+    if(focusedId){ const f = document.getElementById(focusedId); if(f) f.focus(); }
+
+    if(grew){
+      const priceEl = document.querySelector('.price-panel');
+      if(priceEl){ priceEl.classList.add('flash'); setTimeout(()=>priceEl.classList.remove('flash'), 900); }
+    }
+  }, 3000);
+}
+function updateTimerDom(){
+  const el = document.getElementById('timer-val');
+  if(!el || !state.lot) return;
+  const lot = state.lot;
+  const remaining = lot.endTime - Date.now();
+  if(remaining<=0){
+    if(state.view==='auction') renderAuction();
+    return;
+  }
+  const h = Math.floor(remaining/3600000);
+  const m = Math.floor((remaining%3600000)/60000);
+  const s = Math.floor((remaining%60000)/1000);
+  el.textContent = h>0 ? `${h}h ${m}m` : `${m}:${String(s).padStart(2,'0')}`;
+  el.classList.toggle('urgente', remaining < 60000);
+}
+
+function renderAuction(){
+  const lot = state.lot;
+  const ended = endedNow(lot);
+  const leader = currentLeader(lot);
+  const price = currentPrice(lot);
+  const suggested1 = minNextBid(lot);
+  const suggested2 = price + lot.increment*3;
+
+  app.innerHTML = `
+    <button class="back-link" id="back">← salir</button>
+    <div class="status-row">
+      <div class="status-pill ${ended?'':'live'}">${ended? 'rematado' : '<span class="live-dot"></span>en vivo'}</div>
+    </div>
+    <div class="lotno-tag">Lote Nº ${state.code}</div>
+    <div class="card">
+      <div class="spotlight">
+        ${safeImageSrc(lot.image) ? `<img src="${safeImageSrc(lot.image)}" alt="${escapeAttr(lot.title)}">` : `<div style="color:var(--piedra);font-family:'Fraunces',serif;font-style:italic;font-size:20px">sin imagen</div>`}
+      </div>
+      <div class="lot-title">${escapeHtml(lot.title)}</div>
+      ${lot.desc ? `<div class="lot-desc">${escapeHtml(lot.desc)}</div>` : ''}
+
+      <div class="price-panel">
+        <div>
+          <div class="label" style="font-family:'Space Mono',monospace;color:var(--piedra);text-transform:uppercase;letter-spacing:1px;font-size:11px">${ended? 'precio final' : 'puja actual'}</div>
+          <div class="price-big">${fmtMoney(price, lot.currency)}</div>
+          ${leader ? `<div class="leader-name">${ended?'ganó':'lidera'} ${escapeHtml(leader.name)}</div>` : `<div class="leader-name" style="color:var(--piedra)">sin pujas todavía</div>`}
+        </div>
+        <div class="timer">
+          <div class="label" style="font-family:'Space Mono',monospace;color:var(--piedra);text-transform:uppercase;letter-spacing:1px;font-size:11px">${ended?'finalizó':'tiempo'}</div>
+          <div class="t" id="timer-val">${ended? '00:00' : ''}</div>
+        </div>
+      </div>
+
+      ${ended ? `
+        <div class="msg">Esta subasta ya cerró. Generá la ficha final para compartirla.</div>
+      ` : `
+        <div class="name-field">
+          <label>Tu nombre</label>
+          <input type="text" id="bid-name" placeholder="Con qué nombre pujás" value="${escapeAttr(state.bidderName)}">
+        </div>
+        <div class="bidbar">
+          <button class="btn btn-fantasma" id="bid-1">Pujar ${fmtMoney(suggested1, lot.currency)}</button>
+          <button class="btn btn-fantasma" id="bid-2">Pujar ${fmtMoney(suggested2, lot.currency)}</button>
+        </div>
+        <div class="custom-bid">
+          <input type="number" id="bid-custom" placeholder="Otro monto (mín. ${fmtMoney(suggested1, lot.currency)})">
+          <button class="btn btn-oro" id="bid-go">Pujar</button>
+        </div>
+        <div class="msg err" id="bid-err" style="display:none"></div>
+      `}
+
+      <div class="share-row">
+        <button class="btn btn-fantasma" id="btn-img">📸 Compartir en Instagram</button>
+        <button class="btn btn-fantasma" id="btn-share-code">Copiar código</button>
+      </div>
+      <div class="card-code-strip">código: <b>${state.code}</b></div>
+
+      ${lot.bids.length>0 ? `
+        <div class="history">
+          <h4>Historial de pujas (${lot.bids.length})</h4>
+          ${[...lot.bids].reverse().slice(0,10).map((b,i)=>`
+            <div class="hist-item ${i===0?'top':''}">
+              <span class="a">${escapeHtml(b.name)}</span>
+              <span class="p">${fmtMoney(b.amount, lot.currency)}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+    <div class="footer-mark">martillo · lote Nº ${state.code}</div>
+  `;
+
+  document.getElementById('back').onclick = ()=>{
+    stopAuctionLoop(); state.view='home'; render();
+  };
+  document.getElementById('btn-img').onclick = ()=> generateStoryImage();
+  document.getElementById('btn-share-code').onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(state.code); }catch(e){}
+  };
+
+  if(!ended){
+    const nameInput = document.getElementById('bid-name');
+    nameInput.oninput = (e)=>{ state.bidderName = e.target.value; };
+    const doBid = async (amount)=>{
+      const errEl = document.getElementById('bid-err');
+      const name = nameInput.value.trim();
+      if(!name){ errEl.textContent='Ingresá tu nombre para pujar.'; errEl.style.display='block'; return; }
+      if(!Number.isFinite(amount) || amount > 1e15 || amount < minNextBid(state.lot)){
+        errEl.textContent = `La puja mínima es ${fmtMoney(minNextBid(state.lot), state.lot.currency)}.`;
+        errEl.style.display='block'; return;
+      }
+      errEl.style.display='none';
+      state.bidderName = name;
+      const fresh = await loadLot(state.code) || state.lot;
+      if(endedNow(fresh)){ state.lot = fresh; renderAuction(); return; }
+      if(amount < minNextBid(fresh)){
+        errEl.textContent = `Alguien pujó antes que vos. Ahora el mínimo es ${fmtMoney(minNextBid(fresh), fresh.currency)}.`;
+        errEl.style.display='block';
+        state.lot = fresh; renderAuction();
+        return;
+      }
+      fresh.bids.push({name: name.slice(0,40), amount, time:Date.now()});
+      await saveLot(state.code, fresh);
+      state.lot = fresh;
+      renderAuction();
+    };
+    document.getElementById('bid-1').onclick = ()=> doBid(suggested1);
+    document.getElementById('bid-2').onclick = ()=> doBid(suggested2);
+    document.getElementById('bid-go').onclick = ()=>{
+      const v = Number(document.getElementById('bid-custom').value);
+      doBid(v);
+    };
+  }
+  updateTimerDom();
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* ---------------- generación de imagen para Instagram ---------------- */
+async function generateStoryImage(){
+  const lot = state.lot;
+  const canvas = document.getElementById('ig-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const ended = endedNow(lot);
+  const leader = currentLeader(lot);
+  const price = currentPrice(lot);
+
+  // colores del mural
+  const MURO = '#1b1712';
+  const NARANJA = '#e2591c';
+  const TURQUESA = '#12a3a0';
+  const MOSTAZA = '#e6ac2c';
+  const PAPEL = '#f3ead4';
+  const PIEDRA = '#a99c85';
+
+  // aseguramos que las tipografías custom ya estén cargadas antes de dibujar texto
+  try{
+    await Promise.all([
+      document.fonts.load('900 90px Anton'),
+      document.fonts.load('400 40px "Permanent Marker"'),
+      document.fonts.load('700 26px "Space Mono"'),
+    ]);
+    await document.fonts.ready;
+  }catch(e){ /* seguimos igual si falla la carga */ }
+
+  const draw = (img)=>{
+    // fondo pared con manchas de color, como un muro pintado
+    ctx.fillStyle = MURO;
+    ctx.fillRect(0,0,W,H);
+    const blobs = [
+      {x:W*0.05, y:H*0.04, r:520, c:'rgba(226,89,28,0.30)'},
+      {x:W*0.98, y:H*0.10, r:480, c:'rgba(18,163,160,0.26)'},
+      {x:W*0.5, y:H*1.02, r:560, c:'rgba(230,172,44,0.20)'},
+    ];
+    blobs.forEach(b=>{
+      const g = ctx.createRadialGradient(b.x,b.y,10,b.x,b.y,b.r);
+      g.addColorStop(0,b.c); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    });
+
+    // marco doble, tipo desfasaje de serigrafía
+    ctx.strokeStyle = TURQUESA; ctx.lineWidth = 6;
+    ctx.strokeRect(34,34,W-68,H-68);
+    ctx.strokeStyle = NARANJA; ctx.lineWidth = 6;
+    ctx.strokeRect(44,44,W-88,H-88);
+
+    // eyebrow: estado + lote
+    ctx.fillStyle = MOSTAZA;
+    ctx.font = '700 30px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText((ended?'REMATADO · ':'EN VIVO · ') + 'LOTE Nº ' + state.code, W/2, 145);
+
+    // imagen de la pieza, recorte tipo afiche con marco duro
+    const boxW = W*0.74, boxH = H*0.40;
+    const boxX = (W-boxW)/2, boxY = 195;
+    if(img){
+      const ratio = Math.min(boxW/img.width, boxH/img.height);
+      const iw = img.width*ratio, ih = img.height*ratio;
+      const ix = boxX + (boxW-iw)/2, iy = boxY + (boxH-ih)/2;
+      ctx.save();
+      ctx.fillStyle = NARANJA;
+      ctx.fillRect(ix+10, iy+10, iw, ih);
+      ctx.restore();
+      ctx.save();
+      ctx.strokeStyle = PAPEL; ctx.lineWidth = 6;
+      ctx.strokeRect(ix-3, iy-3, iw+6, ih+6);
+      ctx.drawImage(img, ix, iy, iw, ih);
+      ctx.restore();
+    }
+
+    let y = boxY + boxH + 100;
+
+    // título en cartel
+    ctx.fillStyle = PAPEL;
+    ctx.font = '400 56px "Anton", sans-serif';
+    const titleUpper = lot.title.toUpperCase();
+    wrapText(ctx, titleUpper, W/2, y, W*0.82, 64);
+    const titleLines = Math.min(2, Math.ceil(ctx.measureText(titleUpper).width / (W*0.82)));
+    y += 64 * titleLines + 36;
+
+    // linea separadora
+    ctx.strokeStyle = 'rgba(243,234,212,0.25)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(W*0.26,y); ctx.lineTo(W*0.74,y); ctx.stroke();
+    y += 58;
+
+    // label
+    ctx.fillStyle = PIEDRA;
+    ctx.font = '700 27px "Space Mono", monospace';
+    ctx.fillText(ended? 'PRECIO FINAL' : 'PUJA ACTUAL', W/2, y);
+    y += 92;
+
+    // precio grande con desfasaje tipo mal registro de impresión
+    ctx.font = '400 96px "Anton", sans-serif';
+    ctx.fillStyle = MOSTAZA;
+    ctx.fillText(fmtMoney(price, lot.currency), W/2 + 3, y + 3);
+    ctx.fillStyle = NARANJA;
+    ctx.fillText(fmtMoney(price, lot.currency), W/2, y);
+    y += 74;
+
+    // lider, tipo escrito a mano
+    ctx.fillStyle = PAPEL;
+    ctx.font = '400 42px "Permanent Marker", cursive';
+    ctx.fillText(leader ? ((ended? 'ganó ':'lidera ') + leader.name) : 'sin pujas todavía', W/2, y);
+    y += 70;
+
+    // tiempo restante o cierre
+    ctx.fillStyle = PIEDRA;
+    ctx.font = '400 30px "Inter", sans-serif';
+    if(ended){
+      ctx.fillText('Subasta finalizada', W/2, y);
+    }else{
+      const remaining = Math.max(0, lot.endTime - Date.now());
+      const h = Math.floor(remaining/3600000);
+      const m = Math.floor((remaining%3600000)/60000);
+      ctx.fillText(h>0 ? `Quedan ${h}h ${m}m` : `Quedan ${m} min`, W/2, y);
+    }
+
+    // sticker inferior tipo parche
+    const stW = 340, stH = 64, stX = W/2 - stW/2, stY = H-150;
+    ctx.save();
+    ctx.translate(stX+stW/2, stY+stH/2);
+    ctx.rotate(-0.035);
+    ctx.fillStyle = TURQUESA;
+    roundRect(ctx, -stW/2, -stH/2, stW, stH, 30);
+    ctx.fill();
+    ctx.strokeStyle = MURO; ctx.lineWidth = 4; ctx.stroke();
+    ctx.fillStyle = PAPEL;
+    ctx.font = '700 26px "Space Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline='middle';
+    ctx.fillText('🔨 MARTILLO · ' + state.code, 0, 2);
+    ctx.restore();
+    ctx.textBaseline = 'alphabetic';
+
+    canvas.toBlob((blob)=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `martillo-lote-${state.code}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }, 'image/png');
+  };
+
+  if(lot.image){
+    const img = new Image();
+    img.onload = ()=> draw(img);
+    img.onerror = ()=> draw(null);
+    img.src = lot.image;
+  } else {
+    draw(null);
+  }
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  const lines = [];
+  for(let n=0;n<words.length;n++){
+    const test = line + words[n] + ' ';
+    if(ctx.measureText(test).width > maxWidth && n>0){
+      lines.push(line);
+      line = words[n] + ' ';
+    } else {
+      line = test;
+    }
+  }
+  lines.push(line);
+  const startY = curY - (lines.length-1)*lineHeight/2;
+  lines.forEach((l,i)=> ctx.fillText(l.trim(), x, startY + i*lineHeight));
+}
+
+/* init */
+render();
+</script>
+</body>
+</html>

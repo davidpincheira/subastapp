@@ -1,0 +1,16 @@
+# Dependencias (por si más adelante sumás un backend)
+node_modules/
+
+# Artefactos del entorno / builder
+.atl/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Logs
+*.log
